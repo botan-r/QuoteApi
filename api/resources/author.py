@@ -9,20 +9,14 @@ class AuthorResource(Resource):
     def get(self, author_id=None):  # Если запрос приходит по url: /authors
         if author_id is None:
             authors = AuthorModel.query.all()
-            return authors_schema.dump(authors)
-            # authors_list = [author.to_dict() for author in authors]
-            # return authors_list, 200
+            return authors_schema.dump(authors), 200
 
         # Если запрос приходит по url: /authors/<int:author_id>
         author = AuthorModel.query.get(author_id)
-<<<<<<< HEAD
-        if author.id is None:
-=======
         if author is None:
->>>>>>> a00d79c6158be5653c1683e70e21565304b2b643
             return f"Author id={author_id} not found", 404
 
-        return author.to_dict(), 200
+        return author_schema.dump(author), 200
 
     def post(self):
         parser = reqparse.RequestParser()
@@ -31,7 +25,7 @@ class AuthorResource(Resource):
         author = AuthorModel(author_data["name"])
         db.session.add(author)
         db.session.commit()
-        return author.to_dict(), 201
+        return author_schema.dump(author), 201
 
     def put(self, author_id):
         parser = reqparse.RequestParser()
@@ -42,7 +36,7 @@ class AuthorResource(Resource):
             return {"Error": f"Author id={author_id} not found"}, 404
         author.name = author_data["name"]
         db.session.commit()
-        return author.to_dict(), 200
+        return author_schema.dump(author), 200
 
     def delete(self, author_id):
         author = AuthorModel.query.get(author_id)
