@@ -11,7 +11,7 @@ class AuthorResource(Resource):
 
         # Если запрос приходит по url: /authors/<int:author_id>
         author = AuthorModel.query.get(author_id)
-        if author:
+        if author is None:
             return f"Author id={author_id} not found", 404
 
         return author.to_dict(), 200
