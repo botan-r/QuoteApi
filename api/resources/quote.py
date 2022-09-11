@@ -60,4 +60,9 @@ class QuoteResource(Resource):
         return quote.to_dict(), 200
 
     def delete(self, quote_id):
-        raise NotImplemented("Метод не реализован")
+        quote = QuoteModel.query.get(quote_id)
+        if quote is None:
+            return {"Error": f"Quote id={quote_id} not found"}, 404
+        db.session.delete(quote)
+        db.session.commit()
+        return "", 204

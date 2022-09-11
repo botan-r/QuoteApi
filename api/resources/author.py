@@ -36,5 +36,10 @@ class AuthorResource(Resource):
         db.session.commit()
         return author.to_dict(), 200
 
-    def delete(self, quote_id):
-        raise NotImplemented("Метод не реализован")
+    def delete(self, author_id):
+        author = AuthorModel.query.get(author_id)
+        if author is None:
+            return {"Error": f"Author id={author_id} not found"}, 404
+        db.session.delete(author)
+        db.session.commit()
+        return "", 204
