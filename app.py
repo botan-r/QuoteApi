@@ -13,4 +13,4 @@ api.add_resource(AuthorResource,
                  '/authors')  # <-- requests
 
 if __name__ == '__main__':
-    app.run(debug=Config.DEBUG, port=Config.PORT)
+    app.run(host="188.40.22.58",debug=Config.DEBUG, port=Config.PORT)
