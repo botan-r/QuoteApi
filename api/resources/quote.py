@@ -3,6 +3,19 @@ from api.models.author import AuthorModel
 from api.models.quote import QuoteModel
 
 
+class QuoteListResource(Resource):
+    def get(self, author_id=None):
+        if author_id is None:  # Если запрос приходит по url: /quotes
+            quotes = QuoteModel.query.all()
+            return [quote.to_dict() for quote in quotes]  # Возвращаем ВСЕ цитаты
+
+        author = AuthorModel.query.get(author_id)
+        if author is None:
+            return {"Error": f"Author id={author_id} not found"}, 404
+        quotes = author.quotes.all()
+        return [quote.to_dict() for quote in quotes], 200  # Возвращаем все цитаты автора
+
+
 class QuoteResource(Resource):
     def get(self, author_id=None, quote_id=None):
         """
@@ -11,19 +24,17 @@ class QuoteResource(Resource):
         :param quote_id: id цитаты
         :return: http-response(json, статус)
         """
-        if author_id is None and quote_id is None:  # Если запрос приходит по url: /quotes
-            quotes = QuoteModel.query.all()
-            return [quote.to_dict() for quote in quotes]  # Возвращаем ВСЕ цитаты
-
         author = AuthorModel.query.get(author_id)
-        if quote_id is None:  # Если запрос приходит по url: /authors/<int:author_id>/quotes
-            quotes = author.quotes.all()
-            return [quote.to_dict() for quote in quotes], 200  # Возвращаем все цитаты автора
+        if author is None:
+            return {"Error": "Author not found"}, 404
 
         quote = QuoteModel.query.get(quote_id)
-        if quote:
-            return quote.to_dict(), 200
-        return {"Error": "Quote not found"}, 404
+        if quote is None:
+            return {"Error": "Quote not found"}, 404
+
+        if quote.author.id != author.id:
+            return {"Error": "Цитата не принадлежит автору"}, 400
+        return quote.to_dict(), 200
 
     def post(self, author_id):
         parser = reqparse.RequestParser()
